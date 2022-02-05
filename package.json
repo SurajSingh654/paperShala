@@ -1,0 +1,14 @@
+{
+  "name": "paper_shala",
+  "version": "1.0.0",
+  "description": "my_college_project",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "suraj_singh",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.2"
+  }
+}
