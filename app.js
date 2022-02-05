@@ -1,15 +1,28 @@
 // require all modules
 const express = require("express");
+const fs = require("fs");
 
 // call express() to get all methods in it...
 // Creates an Express application. The express() function is a top-level function exported by the express module.
 const app = express();
 
-// handle routes comming from the client
-app.get("/", (req, res) => {
-  res
-    .status(200)
-    .json({ status: "success", message: "Hello from the server!" });
+// handle routes coming from the client
+// app.get("/", (req, res) => {
+//   res
+//     .status(200)
+//     .json({ status: "success", message: "Hello from the server!" });
+// });
+
+// JSON.parse ==> A function that transforms the results. This function is called for each member of the object. If a member contains nested objects, the nested objects are transformed before the parent object is.
+const teachers = JSON.parse(
+  fs.readFileSync("./developmentData/api_data/teacher_apiData.json")
+);
+app.get("/api/v1/teachers", (req, res) => {
+  res.status(200).json({
+    status: "success",
+    totalData: teachers.length,
+    data: { teachers },
+  });
 });
 
 // Listen for connections.
