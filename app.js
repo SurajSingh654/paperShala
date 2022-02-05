@@ -30,6 +30,14 @@ app.get("/api/v1/teachers", (req, res) => {
   });
 });
 
+app.get("/api/v1/teachers/:id", (req, res) => {
+  const teacher = teachers.find((el) => el.id === req.params.id * 1);
+  res.status(200).json({
+    status: "success",
+    data: { teacher },
+  });
+});
+
 // post route handler
 app.post("/api/v1/teachers", (req, res) => {
   console.log("Hello");
