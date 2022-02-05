@@ -4,17 +4,23 @@ const morgan = require("morgan");
 const teacherRouter = require("./routes/teacherRoutes.js");
 
 // call express() to get all methods in it...
-// Creates an Express application. The express() function is a top-level function exported by the express module.
+// Creates an Express application. The express() function is a top-level function exported by the express module
 const app = express();
 
 // Middlewares
 // app-level middleware
 // Express doesn't put body data in the request object explicitly...We have to add middleware i.e, app.use(express.json())
 app.use(express.json());
+app.use((req, res, next) => {
+  console.log("Hello from the App-Level middleware💕🤗");
+  next();
+});
 
 // Morgan Middleware
 // Concise output colored by response status for development use. The :status token will be colored red for server error codes, yellow for client error codes, cyan for redirection codes, and uncolored for all other codes. :method :url :status :response-time ms - :res[content-length]
-app.use(morgan("dev"));
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
 // handle routes coming from the client
 // app.get("/", (req, res) => {
 //   res

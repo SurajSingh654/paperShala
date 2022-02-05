@@ -4,6 +4,27 @@ const teachers = JSON.parse(
   fs.readFileSync("./developmentData/api_data/teacher_apiData.json")
 );
 
+exports.checkBody = (req, res, next) => {
+  if (!req.params.id) {
+    return res.status(404).json({
+      status: "fail",
+      message: "Id is not present",
+    });
+  }
+  next();
+};
+
+exports.checkId = (req, res, next, value) => {
+  console.log(`Tour id is in middleware :${value}`);
+  if (req.params.id * 1 > teachers.length) {
+    return res.status(404).json({
+      status: "fail",
+      message: "Invalid Id",
+    });
+  }
+  next();
+};
+
 exports.getAllTeachers = (req, res) => {
   res.status(200).json({
     status: "success",
@@ -40,12 +61,6 @@ exports.createNewTeacher = (req, res) => {
 };
 
 exports.updateTeacherById = (req, res) => {
-  if (req.params.id > teachers.length) {
-    res.status(404).json({
-      status: "Failed",
-      message: "Invalid Id",
-    });
-  }
   res.status(200).json({
     status: "success",
     data: {
@@ -54,12 +69,6 @@ exports.updateTeacherById = (req, res) => {
   });
 };
 exports.deleteTeacherById = (req, res) => {
-  if (req.params.id > teachers.length) {
-    res.status(404).json({
-      status: "Failed",
-      message: "Invalid Id",
-    });
-  }
   res.status(204).json({
     status: "success",
     data: null,
