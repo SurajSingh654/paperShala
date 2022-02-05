@@ -1,5 +1,6 @@
 [
   {
+    "id": 1,
     "classes": [
       {
         "className": "MCA",
@@ -37,10 +38,7 @@
             "marks": 2,
             "question": "How can a dataType be declared to be a constant type?"
           },
-          {
-            "marks": 3,
-            "question": "What is javaScript?"
-          },
+          { "marks": 3, "question": "What is javaScript?" },
           {
             "marks": 5,
             "question": "What is javaScript?What are it's applications?"
@@ -48,5 +46,9 @@
         ]
       }
     ]
+  },
+  {
+    "id": 2,
+    "name": "Suraj singh"
   }
 ]
