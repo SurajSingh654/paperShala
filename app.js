@@ -21,25 +21,23 @@ const teachers = JSON.parse(
   fs.readFileSync("./developmentData/api_data/teacher_apiData.json")
 );
 
-// get route handler
-app.get("/api/v1/teachers", (req, res) => {
+const getAllTeachers = (req, res) => {
   res.status(200).json({
     status: "success",
     totalData: teachers.length,
     data: { teachers },
   });
-});
+};
 
-app.get("/api/v1/teachers/:id", (req, res) => {
+const getTeacherById = (req, res) => {
   const teacher = teachers.find((el) => el.id === req.params.id * 1);
   res.status(200).json({
     status: "success",
     data: { teacher },
   });
-});
+};
 
-// post route handler
-app.post("/api/v1/teachers", (req, res) => {
+const createNewTeacher = (req, res) => {
   console.log("Hello");
   const newTeacher = req.body;
   teachers.push(newTeacher);
@@ -56,7 +54,47 @@ app.post("/api/v1/teachers", (req, res) => {
       });
     }
   );
-});
+};
+
+const updateTeacherById = (req, res) => {
+  if (req.params.id > teachers.length) {
+    res.status(404).json({
+      status: "Failed",
+      message: "Invalid Id",
+    });
+  }
+  res.status(200).json({
+    status: "success",
+    data: {
+      teacher: "<Updated teacher data>",
+    },
+  });
+};
+const deleteTeacherById = (req, res) => {
+  if (req.params.id > teachers.length) {
+    res.status(404).json({
+      status: "Failed",
+      message: "Invalid Id",
+    });
+  }
+  res.status(204).json({
+    status: "success",
+    data: null,
+  });
+};
+// get route handler
+app.get("/api/v1/teachers", getAllTeachers);
+
+app.get("/api/v1/teachers/:id", getTeacherById);
+
+// post route handler
+app.post("/api/v1/teachers", createNewTeacher);
+
+// patch handler
+app.patch("/api/v1/teachers/:id", updateTeacherById);
+
+// delete handler
+app.delete("/api/v1/teachers/:id", deleteTeacherById);
 
 // Listen for connections.
 
