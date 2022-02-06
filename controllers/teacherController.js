@@ -1,8 +1,16 @@
 const Teacher = require("./../models/teacherModel.js");
+const APIFeatures = require("./../utils/APIFeatures.js");
 
 exports.getAllTeachers = async (req, res) => {
   try {
-    const teachers = await Teacher.find();
+    // Build Query
+    const features = new APIFeatures(Teacher.find(), req.query)
+      .filter()
+      .sort()
+      .paginate()
+      .limitFields();
+    // Execute Query
+    const teachers = await features.query;
     res.status(200).json({
       status: "success",
       totalData: teachers.length,
