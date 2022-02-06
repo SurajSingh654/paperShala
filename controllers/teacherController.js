@@ -1,76 +1,81 @@
-const fs = require("fs");
+const Teacher = require("./../models/teacherModel.js");
 
-const teachers = JSON.parse(
-  fs.readFileSync("./developmentData/api_data/teacher_apiData.json")
-);
-
-exports.checkBody = (req, res, next) => {
-  if (!req.params.id) {
-    return res.status(404).json({
+exports.getAllTeachers = async (req, res) => {
+  try {
+    const teachers = await Teacher.find();
+    res.status(200).json({
+      status: "success",
+      totalData: teachers.length,
+      data: { teachers },
+    });
+  } catch (e) {
+    res.status(400).json({
       status: "fail",
-      message: "Id is not present",
+      message: "Invalid",
     });
   }
-  next();
 };
 
-exports.checkId = (req, res, next, value) => {
-  console.log(`Tour id is in middleware :${value}`);
-  if (req.params.id * 1 > teachers.length) {
-    return res.status(404).json({
+exports.getTeacherById = async (req, res) => {
+  try {
+    const teacher = await Teacher.findById(req.params.id);
+    res.status(200).json({
+      status: "success",
+      data: { teacher },
+    });
+  } catch (e) {
+    res.status(400).json({
       status: "fail",
-      message: "Invalid Id",
+      message: "Invalid",
     });
   }
-  next();
 };
 
-exports.getAllTeachers = (req, res) => {
-  res.status(200).json({
-    status: "success",
-    totalData: teachers.length,
-    data: { teachers },
-  });
+exports.createNewTeacher = async (req, res) => {
+  try {
+    const newTeacher = await Teacher.create(req.body);
+    res.status(201).json({
+      status: "success",
+      data: {
+        teacher: newTeacher,
+      },
+    });
+  } catch (e) {
+    res.status(400).json({
+      status: "fail",
+      message: "Invalid",
+    });
+  }
 };
 
-exports.getTeacherById = (req, res) => {
-  const teacher = teachers.find((el) => el.id === req.params.id * 1);
-  res.status(200).json({
-    status: "success",
-    data: { teacher },
-  });
+exports.updateTeacherById = async (req, res) => {
+  try {
+    const teacher = await Teacher.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    res.status(200).json({
+      status: "success",
+      data: { teacher },
+    });
+  } catch (e) {
+    res.status(400).json({
+      status: "fail",
+      message: "Invalid",
+    });
+  }
 };
-
-exports.createNewTeacher = (req, res) => {
-  console.log("Hello");
-  const newTeacher = req.body;
-  teachers.push(newTeacher);
-  console.log(newTeacher);
-  fs.writeFile(
-    "./developmentData/api_data/teacher_apiData.json",
-    JSON.stringify(teachers),
-    (err) => {
-      res.status(201).json({
-        status: "success",
-        data: {
-          newTeacher,
-        },
-      });
-    }
-  );
-};
-
-exports.updateTeacherById = (req, res) => {
-  res.status(200).json({
-    status: "success",
-    data: {
-      teacher: "<Updated teacher data>",
-    },
-  });
-};
-exports.deleteTeacherById = (req, res) => {
-  res.status(204).json({
-    status: "success",
-    data: null,
-  });
+exports.deleteTeacherById = async (req, res) => {
+  try {
+    await Teacher.findByIdAndDelete(req.params.id);
+    res.status(204).json({
+      status: "success",
+      data: null,
+    });
+  } catch (e) {
+    res.status(404).json({
+      status: "fail",
+      message: "Invalid",
+    });
+  }
 };

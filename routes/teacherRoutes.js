@@ -10,12 +10,12 @@ const router = express.Router();
 
 // The callback uses the samesignature as middleware, the only differencing being that the value of the placeholder is passed, in this case the id of the user. Once the next() function is invoked, just like middleware it will continue on to execute the route, or subsequent parameter functions.
 
-router.param("id", teacherController.checkId);
+// router.param("id", teacherController.checkId);
 
 router
   .route("/")
   .get(teacherController.getAllTeachers)
-  .post(teacherController.checkBody, teacherController.createNewTeacher);
+  .post(teacherController.createNewTeacher);
 router
   .route("/:id")
   .get(teacherController.getTeacherById)
