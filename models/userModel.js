@@ -76,6 +76,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please provide a password"],
     minlength: 8,
+    select: false, //NOT FETCH PASSWORD WITH ALL USER DATA
   },
   confirmPassword: {
     type: String,
@@ -119,6 +120,15 @@ userSchema.pre("save", async function (next) {
   // NO NEED TO PERSIST confirmPassword in DATABASE
   this.confirmPassword = undefined;
 });
+
+// INSTANCE METHOD
+userSchema.methods.checkPasswordMatch = function (
+  candidatePassword,
+  userPassword
+) {
+  // NOT USE this.password as, {select:false} in schema
+  return bcrypt.compare(candidatePassword, userPassword);
+};
 
 const User = mongoose.model("User", userSchema);
 
