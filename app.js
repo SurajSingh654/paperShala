@@ -2,6 +2,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const teacherRouter = require("./routes/teacherRoutes.js");
+const userRouter = require("./routes/userRoutes.js");
 const AppError = require("./utils/appError");
 const globalErrorHandlers = require("./controllers/errorController.js");
 
@@ -34,6 +35,7 @@ if (process.env.NODE_ENV === "development") {
 
 // Mount teacherRouter with "/api/v1/teachers"
 app.use("/api/v1/teachers", teacherRouter);
+app.use("/api/v1/users", userRouter);
 
 // Handle all invalid routes
 app.all("*", (req, res, next) => {
