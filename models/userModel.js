@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const bcrypt = require("bcryptjs");
 
 const addressSchema = new mongoose.Schema({
   addressStreet: {
@@ -81,6 +82,7 @@ const userSchema = new mongoose.Schema({
     required: [true, "Please confirm your password"],
     validate: {
       // THIS ONLY WORKS ON CREATE and SAVE!!!!!
+      // NOT WORK WITH REGULAR UPDATE
       validator: function (el) {
         return el === this.password;
       },
@@ -106,6 +108,16 @@ const userSchema = new mongoose.Schema({
       message: "Category should be: Teacher,Student,Admin or Others",
     },
   },
+});
+
+// Mongoose Document Middleware
+userSchema.pre("save", async function (next) {
+  // RUN ONLY WHEN PASSWORD IS UPDATED or USER SIGNUP
+  if (!this.isModified("password")) return next();
+  // ENCRYPT THE PASSWORD
+  this.password = await bcrypt.hash(this.password, 12);
+  // NO NEED TO PERSIST confirmPassword in DATABASE
+  this.confirmPassword = undefined;
 });
 
 const User = mongoose.model("User", userSchema);
