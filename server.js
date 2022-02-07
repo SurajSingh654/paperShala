@@ -1,5 +1,13 @@
 // Dotenv is a zero-dependency module that loads environment variables from a .env file into process.env
 const dotenv = require("dotenv");
+
+// handle unCaughtException
+process.on("uncaughtException", (err) => {
+  console.log(`error: ${err.name}`);
+  console.log(`message: ${err.message}`);
+  console.log("UNCAUGHT EXCEPTION 💥💥 Shutting Down...");
+  process.exit(1);
+});
 dotenv.config({ path: "./config.env" });
 const app = require("./app.js");
 
@@ -27,6 +35,15 @@ mongoose
 
 // http.createServer(app).listen(80); https.createServer({ ... }, app).listen(443);
 const port = 3000;
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`App running on port ${port}`);
+});
+
+// handle unhandledPromiseRejections
+process.on("unhandledRejection", (err) => {
+  console.log(err);
+  console.log("UNHANDLED REJECTION 💥💥 Shutting Down...");
+  server.close(() => {
+    process.exit(1);
+  });
 });

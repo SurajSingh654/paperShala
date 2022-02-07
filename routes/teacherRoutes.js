@@ -12,6 +12,7 @@ const router = express.Router();
 
 // router.param("id", teacherController.checkId);
 
+router.route("/teacherStats").get(teacherController.getTeacherStats);
 router
   .route("/")
   .get(teacherController.getAllTeachers)

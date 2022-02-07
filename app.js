@@ -2,6 +2,8 @@
 const express = require("express");
 const morgan = require("morgan");
 const teacherRouter = require("./routes/teacherRoutes.js");
+const AppError = require("./utils/appError");
+const globalErrorHandlers = require("./controllers/errorController.js");
 
 // call express() to get all methods in it...
 // Creates an Express application. The express() function is a top-level function exported by the express module
@@ -32,4 +34,20 @@ if (process.env.NODE_ENV === "development") {
 
 // Mount teacherRouter with "/api/v1/teachers"
 app.use("/api/v1/teachers", teacherRouter);
+
+// Handle all invalid routes
+app.all("*", (req, res, next) => {
+  // res.status(404).json({
+  //   status: "fail",
+  //   message: `Can't find ${req.originalUrl} on this server😑`,
+  // });
+
+  // Generate all invalid routes errors
+  // const error = new Error(`Can't find ${req.originalUrl} on this server😑`);
+  // error.status = "fail";
+  // error.statusCode = 404;
+  next(new AppError(`Can't find ${req.originalUrl} on this server😑`, 404));
+});
+// Error Handler
+app.use(globalErrorHandlers);
 module.exports = app;

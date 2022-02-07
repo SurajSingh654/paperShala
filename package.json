@@ -4,7 +4,9 @@
   "description": "my_college_project",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "startProd": "NODE_ENV=production nodemon server.js",
+    "debug": "ndb server.js"
   },
   "author": "suraj_singh",
   "license": "ISC",
@@ -13,5 +15,8 @@
     "express": "^4.17.2",
     "mongoose": "^5.13.14",
     "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "ndb": "^1.1.5"
   }
 }
