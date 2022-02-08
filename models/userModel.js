@@ -41,19 +41,19 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "FirstName must be present"],
       trim: true,
-      lowercase: true,
+      // lowercase: true,
     },
     middleName: {
       type: String,
       default: "",
       trim: true,
-      lowercase: true,
+      // lowercase: true,
     },
     lastName: {
       type: String,
       required: [true, "LastName must be present"],
       trim: true,
-      lowercase: true,
+      // lowercase: true,
     },
     emailId: {
       type: String,
@@ -125,22 +125,40 @@ const userSchema = new mongoose.Schema(
 // 2) WORK IN GET METHOD
 // 3) CAN'T QUERY WITH THESE PROPERTIES
 userSchema.virtual("fullName").get(function () {
-  return (
-    this.firstName.charAt(0).toUpperCase() +
-    "" +
-    this.firstName.slice(1) +
-    " " +
-    this.middleName.charAt(0).toUpperCase() +
-    "" +
-    this.middleName.slice(1) +
-    " " +
-    this.lastName.charAt(0).toUpperCase() +
-    "" +
-    this.lastName.slice(1)
-  );
+  if (!this.middleName) return this.firstName + " " + this.lastName;
+  else {
+    return this.firstName + " " + this.middleName + " " + this.lastName;
+  }
 });
 
 // Mongoose Document Middleware
+
+// THIS MIDDLEWARE RUN ONLY ON .save() and .create()
+userSchema.pre("save", function (next) {
+  this.firstName =
+    this.firstName.charAt(0).toUpperCase() +
+    "" +
+    this.firstName.slice(1).toLowerCase();
+  this.middleName =
+    this.middleName.charAt(0).toUpperCase() +
+    "" +
+    this.middleName.slice(1).toLowerCase();
+  this.lastName =
+    this.lastName.charAt(0).toUpperCase() +
+    "" +
+    this.lastName.slice(1).toLowerCase();
+  const capitalize = (val) => {
+    return val
+      .replace(/[^A-Za-z]+/g, " ")
+      .split(" ")
+      .map((el) => el.charAt(0).toUpperCase() + "" + el.slice(1).toLowerCase())
+      .join(" ");
+  };
+  this.address.state = capitalize(this.address.state);
+  this.address.city = capitalize(this.address.city);
+  this.address.country = capitalize(this.address.country);
+  next();
+});
 userSchema.pre("save", async function (next) {
   // RUN ONLY WHEN PASSWORD IS UPDATED or USER SIGNUP
   if (!this.isModified("password")) return next();
