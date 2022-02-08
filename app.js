@@ -50,6 +50,6 @@ app.all("*", (req, res, next) => {
   // error.statusCode = 404;
   next(new AppError(`Can't find ${req.originalUrl} on this server😑`, 404));
 });
-// Error Handler
+// Global Error Handler
 app.use(globalErrorHandlers);
 module.exports = app;
