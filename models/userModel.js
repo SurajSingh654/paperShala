@@ -35,80 +35,109 @@ const addressSchema = new mongoose.Schema({
   },
 });
 
-const userSchema = new mongoose.Schema({
-  firstName: {
-    type: String,
-    required: [true, "FirstName must be present"],
-    trim: true,
-  },
-  middleName: {
-    type: String,
-    default: "",
-    trim: true,
-  },
-  lastName: {
-    type: String,
-    required: [true, "LastName must be present"],
-    trim: true,
-  },
-  emailId: {
-    type: String,
-    required: [true, "EmailId must be present"],
-    unique: true,
-    lowercase: true,
-    trim: true,
-    validate: [validator.isEmail, "please provide valid emailId"],
-  },
-  phoneNumber: {
-    type: Number,
-    required: [true, "PhoneNumber must be present"],
-    unique: true,
-    validate: {
-      validator: function (value) {
-        // if use this keyword then this only use to current doc on NEW DOCUMENT CREATION
-        return value.toString().length === 10;
+const userSchema = new mongoose.Schema(
+  {
+    firstName: {
+      type: String,
+      required: [true, "FirstName must be present"],
+      trim: true,
+      lowercase: true,
+    },
+    middleName: {
+      type: String,
+      default: "",
+      trim: true,
+      lowercase: true,
+    },
+    lastName: {
+      type: String,
+      required: [true, "LastName must be present"],
+      trim: true,
+      lowercase: true,
+    },
+    emailId: {
+      type: String,
+      required: [true, "EmailId must be present"],
+      unique: true,
+      lowercase: true,
+      trim: true,
+      validate: [validator.isEmail, "please provide valid emailId"],
+    },
+    phoneNumber: {
+      type: Number,
+      required: [true, "PhoneNumber must be present"],
+      unique: true,
+      validate: {
+        validator: function (value) {
+          // if use this keyword then this only use to current doc on NEW DOCUMENT CREATION
+          return value.toString().length === 10;
+        },
+        message: "phoneNumber must be of 10 digits",
       },
-      message: "phoneNumber must be of 10 digits",
     },
-  },
-  photo: String,
-  password: {
-    type: String,
-    required: [true, "Please provide a password"],
-    minlength: 8,
-    select: false, //NOT FETCH PASSWORD WITH ALL USER DATA
-  },
-  confirmPassword: {
-    type: String,
-    required: [true, "Please confirm your password"],
-    validate: {
-      // THIS ONLY WORKS ON CREATE and SAVE!!!!!
-      // NOT WORK WITH REGULAR UPDATE
-      validator: function (el) {
-        return el === this.password;
+    photo: String,
+    password: {
+      type: String,
+      required: [true, "Please provide a password"],
+      minlength: 8,
+      select: false, //NOT FETCH PASSWORD WITH ALL USER DATA
+    },
+    confirmPassword: {
+      type: String,
+      required: [true, "Please confirm your password"],
+      validate: {
+        // THIS ONLY WORKS ON CREATE and SAVE!!!!!
+        // NOT WORK WITH REGULAR UPDATE
+        validator: function (el) {
+          return el === this.password;
+        },
+        message: "Passwords are not same",
       },
-      message: "Passwords are not same",
+    },
+    address: addressSchema,
+    gender: {
+      type: String,
+      required: [true, "Gender must be present"],
+      trim: true,
+      enum: {
+        values: ["Male", "Female", "Others"],
+        message: "Gender should be: Male, Female or Others",
+      },
+    },
+    category: {
+      type: String,
+      required: [true, "category must be required"],
+      trim: true,
+      enum: {
+        values: ["Teacher", "Student", "Admin", "Others"],
+        message: "Category should be: Teacher,Student or Others",
+      },
     },
   },
-  address: addressSchema,
-  gender: {
-    type: String,
-    required: [true, "Gender must be present"],
-    trim: true,
-    enum: {
-      values: ["Male", "Female", "Others"],
-      message: "Gender should be: Male, Female or Others",
-    },
-  },
-  category: {
-    type: String,
-    required: [true, "category must be required"],
-    trim: true,
-    enum: {
-      values: ["Teacher", "Student", "Admin", "Others"],
-      message: "Category should be: Teacher,Student,Admin or Others",
-    },
-  },
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
+);
+
+// VIRTUAL PROPERTIES
+// 1) NEVER PERSIST IN DATABASE
+// 2) WORK IN GET METHOD
+// 3) CAN'T QUERY WITH THESE PROPERTIES
+userSchema.virtual("fullName").get(function () {
+  return (
+    this.firstName.charAt(0).toUpperCase() +
+    "" +
+    this.firstName.slice(1) +
+    " " +
+    this.middleName.charAt(0).toUpperCase() +
+    "" +
+    this.middleName.slice(1) +
+    " " +
+    this.lastName.charAt(0).toUpperCase() +
+    "" +
+    this.lastName.slice(1)
+  );
 });
 
 // Mongoose Document Middleware
