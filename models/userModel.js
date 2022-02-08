@@ -94,6 +94,7 @@ const userSchema = new mongoose.Schema(
         message: "Passwords are not same",
       },
     },
+    passwordChangedAt: Date,
     address: addressSchema,
     gender: {
       type: String,
@@ -175,6 +176,17 @@ userSchema.methods.checkPasswordMatch = function (
 ) {
   // NOT USE this.password as, {select:false} in schema
   return bcrypt.compare(candidatePassword, userPassword);
+};
+
+userSchema.methods.checkPasswordChangedAt = function (JWTTimeStamp) {
+  if (this.passwordChangedAt) {
+    const changedTimeStamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+    return JWTTimeStamp < changedTimeStamp;
+  }
+  return false;
 };
 
 const User = mongoose.model("User", userSchema);

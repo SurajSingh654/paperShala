@@ -18,6 +18,16 @@ const handleValidationError = (err) => {
   const message = `Invalid Data Input . ${errors.join(". ")}`;
   return new AppError(message, 404);
 };
+
+// Handle JWT verification error
+
+const handleJWTError = () =>
+  new AppError("Not an authorized user . Please login again!", 401);
+
+// Handle JWT Token Session Expired Error
+const handleJWTSessionExpiredError = () =>
+  new AppError("Session expired! Please Login again...", 401);
+
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -52,17 +62,28 @@ module.exports = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   // Error status is defined otherwise "error"
   err.status = err.status || "error";
+
   if (process.env.NODE_ENV === "development") {
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === "production") {
     let error = { ...err };
+    // console.log(`Err in production ${err.message}`);
+    console.log(error);
+    // console.log(`Error in production ${error.message}`);
     console.log("---------------------Error----------------");
-    console.log(err);
-    // CastError: Cast to ObjectId failed error
-    if (error.kind === "ObjectId") error = handleCastError(error);
-    if (error.code === 11000) error = handleDuplicateFieldError(error);
-    if (error._message === "Validation failed")
-      error = handleValidationError(error);
-    sendErrorProd(error, res);
+    // console.error(err);
+    if (error.message) {
+      // CastError: Cast to ObjectId failed error
+      if (error.kind === "ObjectId") error = handleCastError(error);
+      if (error.code === 11000) error = handleDuplicateFieldError(error);
+      if (error._message === "Validation failed")
+        error = handleValidationError(error);
+      if (error.name === "JsonWebTokenError") error = handleJWTError();
+      if (error.name === "TokenExpiredError")
+        error = handleJWTSessionExpiredError();
+      sendErrorProd(error, res);
+    } else {
+      sendErrorProd(err, res);
+    }
   }
 };
