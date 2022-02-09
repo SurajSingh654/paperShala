@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 
 const addressSchema = new mongoose.Schema({
   addressStreet: {
@@ -95,6 +96,8 @@ const userSchema = new mongoose.Schema(
       },
     },
     passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
     address: addressSchema,
     gender: {
       type: String,
@@ -169,6 +172,14 @@ userSchema.pre("save", async function (next) {
   this.confirmPassword = undefined;
 });
 
+userSchema.pre("save", function (next) {
+  // USE isNew PROPERTY TO KNOW WHETHER DOCUMENT IS NEWLY CREATED OR NOT
+  if (!this.isModified("password") || !this.isNew) return next();
+  // SUBTRACT 1 SEC B'COZ SOMETIMES THERE IS A DELAY TO SAVE PROPERTY IN DATABASE
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
 // INSTANCE METHOD
 userSchema.methods.checkPasswordMatch = function (
   candidatePassword,
@@ -187,6 +198,17 @@ userSchema.methods.checkPasswordChangedAt = function (JWTTimeStamp) {
     return JWTTimeStamp < changedTimeStamp;
   }
   return false;
+};
+
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  this.passwordResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+  console.log({ resetToken }, this.passwordResetToken);
+  return resetToken;
 };
 
 const User = mongoose.model("User", userSchema);
