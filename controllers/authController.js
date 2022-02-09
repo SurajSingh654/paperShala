@@ -12,16 +12,27 @@ const assignToken = (id) => {
   });
 };
 
-exports.signup = catchAsync(async (req, res, next) => {
-  const newUser = await User.create(req.body);
-  const token = assignToken(newUser._id);
-  res.status(201).json({
+const assignAndSendToken = (user, statusCode, res) => {
+  const token = assignToken(user._id);
+  res.status(statusCode).json({
     status: "success",
     token,
     data: {
-      user: newUser,
+      user,
     },
   });
+};
+exports.signup = catchAsync(async (req, res, next) => {
+  const newUser = await User.create(req.body);
+  // const token = assignToken(newUser._id);
+  // res.status(201).json({
+  //   status: "success",
+  //   token,
+  //   data: {
+  //     user: newUser,
+  //   },
+  // });
+  assignAndSendToken(newUser, 201, res);
   //   next();
 });
 exports.login = catchAsync(async (req, res, next) => {
@@ -38,13 +49,14 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!user || !(await user.checkPasswordMatch(password, user.password))) {
     return next(new AppError("email or password is wrong", 401));
   }
+  assignAndSendToken(user, 202, res);
 
-  const token = assignToken(user._id);
-  // IF EVERYTHING IS OK
-  res.status(200).json({
-    status: "success",
-    token,
-  });
+  // const token = assignToken(user._id);
+  // // IF EVERYTHING IS OK
+  // res.status(200).json({
+  //   status: "success",
+  //   token,
+  // });
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -155,10 +167,32 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   user.passwordResetExpires = undefined;
   await user.save();
   // 4) LOG USER IN, SEND JWT TOKEN
-  const token = assignToken(user._id);
-  // IF EVERYTHING IS OK
-  res.status(200).json({
-    status: "success",
-    token,
-  });
+  assignAndSendToken(user, 200, res);
+
+  // const token = assignToken(user._id);
+  // // IF EVERYTHING IS OK
+  // res.status(200).json({
+  //   status: "success",
+  //   token,
+  // });
 });
+
+exports.updatePssswordForCurrentLoginUser = catchAsync(
+  async (req, res, next) => {
+    // 1) Get user from collection
+    const user = await User.findById(req.user.id).select("+password");
+    // 2) Check if posted current password is correct
+
+    if (
+      !(await user.checkPasswordMatch(req.body.currentPassword, user.password))
+    ) {
+      return next(new AppError("Incorrect password!"), 401);
+    }
+    // 3) If so, update password
+    user.password = req.body.password;
+    user.confirmPassword = req.body.confirmPassword;
+    await user.save();
+    // 4) Log user in, send JWT token
+    assignAndSendToken(user, 201, res);
+  }
+);
