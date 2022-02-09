@@ -12,7 +12,12 @@ router.patch(
   authController.protect,
   authController.updatePssswordForCurrentLoginUser
 );
-
+router.patch(
+  "/updateMyData",
+  authController.protect,
+  userController.updateMyData
+);
+router.delete("/deleteMe", authController.protect, userController.deleteMe);
 router
   .route("/")
   .get(

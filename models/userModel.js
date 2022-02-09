@@ -117,6 +117,11 @@ const userSchema = new mongoose.Schema(
         message: "Category should be: Teacher,Student or Others",
       },
     },
+    active: {
+      type: Boolean,
+      default: true,
+      select: false,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -177,6 +182,11 @@ userSchema.pre("save", function (next) {
   if (!this.isModified("password") || !this.isNew) return next();
   // SUBTRACT 1 SEC B'COZ SOMETIMES THERE IS A DELAY TO SAVE PROPERTY IN DATABASE
   this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
+userSchema.pre(/^find/, function (next) {
+  this.find({ active: { $ne: false } });
   next();
 });
 
