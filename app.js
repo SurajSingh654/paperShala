@@ -1,6 +1,7 @@
 // require all modules
 const express = require("express");
 const morgan = require("morgan");
+const rateLimit = require("express-rate-limit");
 const teacherRouter = require("./routes/teacherRoutes.js");
 const userRouter = require("./routes/userRoutes.js");
 const AppError = require("./utils/appError");
@@ -24,6 +25,15 @@ app.use((req, res, next) => {
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
+
+// Middleware to restrict number of logins based on time
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message:
+    "Too many requests from your side...Please try again after one hour!",
+});
+app.use("/api", limiter);
 // handle routes coming from the client
 // app.get("/", (req, res) => {
 //   res
