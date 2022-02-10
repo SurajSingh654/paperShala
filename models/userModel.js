@@ -3,39 +3,6 @@ const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 
-const addressSchema = new mongoose.Schema({
-  addressStreet: {
-    type: String,
-    required: [true, "Address must be present"],
-    trim: true,
-  },
-  city: {
-    type: String,
-    required: [true, "City must be required"],
-    trim: true,
-  },
-  state: {
-    type: String,
-    required: [true, "State must be required"],
-    trim: true,
-  },
-  pinCode: {
-    type: Number,
-    required: [true, "Pincode must be required"],
-    validate: {
-      validator: function (value) {
-        return value.toString().length === 6;
-      },
-      message: "pinCode must be of 6 digits",
-    },
-  },
-  country: {
-    type: String,
-    required: [true, "Country must be present"],
-    trim: true,
-  },
-});
-
 const userSchema = new mongoose.Schema(
   {
     firstName: {
@@ -66,7 +33,7 @@ const userSchema = new mongoose.Schema(
     },
     phoneNumber: {
       type: Number,
-      required: [true, "PhoneNumber must be present"],
+      // required: [true, "PhoneNumber must be present"],
       unique: true,
       validate: {
         validator: function (value) {
@@ -98,10 +65,41 @@ const userSchema = new mongoose.Schema(
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
-    address: addressSchema,
+    address: {
+      addressStreet: {
+        type: String,
+        required: [true, "Address must be present"],
+        trim: true,
+      },
+      city: {
+        type: String,
+        required: [true, "City must be required"],
+        trim: true,
+      },
+      state: {
+        type: String,
+        required: [true, "State must be required"],
+        trim: true,
+      },
+      pinCode: {
+        type: Number,
+        required: [true, "Pincode must be required"],
+        validate: {
+          validator: function (value) {
+            return value.toString().length === 6;
+          },
+          message: "pinCode must be of 6 digits",
+        },
+      },
+      country: {
+        type: String,
+        required: [true, "Country must be present"],
+        trim: true,
+      },
+    },
     gender: {
       type: String,
-      required: [true, "Gender must be present"],
+      // required: [true, "Gender must be present"],
       trim: true,
       enum: {
         values: ["Male", "Female", "Others"],
