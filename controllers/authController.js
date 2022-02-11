@@ -102,7 +102,7 @@ exports.protect = catchAsync(async (req, res, next) => {
       new AppError("Password changed recently...Please Login again!")
     );
   }
-
+  // PASS USER DATA IN req.user
   req.user = freshUser;
   // GRANT ACCESS
   next();

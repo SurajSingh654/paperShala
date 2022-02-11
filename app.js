@@ -8,6 +8,10 @@ const xss = require("xss-clean");
 const hpp = require("hpp");
 const teacherRouter = require("./routes/teacherRoutes.js");
 const userRouter = require("./routes/userRoutes.js");
+const classRouter = require("./routes/classRoutes.js");
+const questionRouter = require("./routes/questionRoutes.js");
+const examPaperRouter = require("./routes/examPaperRoutes.js");
+
 const AppError = require("./utils/appError");
 const globalErrorHandlers = require("./controllers/errorController.js");
 
@@ -54,6 +58,9 @@ app.use(hpp());
 // Mount teacherRouter with "/api/v1/teachers"
 app.use("/api/v1/teachers", teacherRouter);
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/classes", classRouter);
+app.use("/api/v1/questions", questionRouter);
+app.use("/api/v1/examPapers", examPaperRouter);
 
 // Handle all invalid routes
 app.all("*", (req, res, next) => {

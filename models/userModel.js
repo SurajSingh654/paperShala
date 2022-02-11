@@ -111,8 +111,8 @@ const userSchema = new mongoose.Schema(
       required: [true, "category must be required"],
       trim: true,
       enum: {
-        values: ["Teacher", "Student", "Admin", "Others"],
-        message: "Category should be: Teacher,Student or Others",
+        values: ["Teacher", "Student", "Admin"],
+        message: "Category should be: Teacher,Student or Admin",
       },
     },
     active: {
@@ -166,6 +166,8 @@ userSchema.pre("save", function (next) {
   this.address.country = capitalize(this.address.country);
   next();
 });
+
+// PASSWORD ENCRYPTION MIDDLEWARE
 userSchema.pre("save", async function (next) {
   // RUN ONLY WHEN PASSWORD IS UPDATED or USER SIGNUP
   if (!this.isModified("password")) return next();
@@ -175,6 +177,7 @@ userSchema.pre("save", async function (next) {
   this.confirmPassword = undefined;
 });
 
+// CREATE PASSWORD CHANGED PROPERTY
 userSchema.pre("save", function (next) {
   // USE isNew PROPERTY TO KNOW WHETHER DOCUMENT IS NEWLY CREATED OR NOT
   if (!this.isModified("password") || !this.isNew) return next();
@@ -183,12 +186,15 @@ userSchema.pre("save", function (next) {
   next();
 });
 
+// REMOVE ALL THE USERS WHO ARE NOT ACTIVE
 userSchema.pre(/^find/, function (next) {
   this.find({ active: { $ne: false } });
   next();
 });
 
-// INSTANCE METHOD
+// INSTANCE METHODS
+
+// MATCH YOUR PASSWORD WITH THE PASSWORD SAVE IN DATABASE
 userSchema.methods.checkPasswordMatch = function (
   candidatePassword,
   userPassword
@@ -197,6 +203,7 @@ userSchema.methods.checkPasswordMatch = function (
   return bcrypt.compare(candidatePassword, userPassword);
 };
 
+// CHECK PASSWORD CHANGED TIME
 userSchema.methods.checkPasswordChangedAt = function (JWTTimeStamp) {
   if (this.passwordChangedAt) {
     const changedTimeStamp = parseInt(
@@ -208,6 +215,7 @@ userSchema.methods.checkPasswordChangedAt = function (JWTTimeStamp) {
   return false;
 };
 
+// CREATE TOKEN WHEN PASSWORD IS RESET
 userSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString("hex");
   this.passwordResetToken = crypto

@@ -18,6 +18,8 @@ router.patch(
   userController.updateMyData
 );
 router.delete("/deleteMe", authController.protect, userController.deleteMe);
+
+// ONLY ACCESSIBLE TO ADMIN
 router
   .route("/")
   .get(
