@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema(
     phoneNumber: {
       type: Number,
       // required: [true, "PhoneNumber must be present"],
-      unique: true,
+      // unique: true,
       validate: {
         validator: function (value) {
           // if use this keyword then this only use to current doc on NEW DOCUMENT CREATION
@@ -111,10 +111,17 @@ const userSchema = new mongoose.Schema(
       required: [true, "category must be required"],
       trim: true,
       enum: {
-        values: ["Teacher", "Student", "Admin"],
-        message: "Category should be: Teacher,Student or Admin",
+        values: ["Teacher", "Student", "Admin", "OrganizationHead"],
+        message:
+          "Category should be: Teacher,Student,OrganizationHead or Admin",
       },
     },
+    organizations: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "Organization",
+      },
+    ],
     active: {
       type: Boolean,
       default: true,
@@ -131,12 +138,16 @@ const userSchema = new mongoose.Schema(
 // 1) NEVER PERSIST IN DATABASE
 // 2) WORK IN GET METHOD
 // 3) CAN'T QUERY WITH THESE PROPERTIES
+// 4) VIRTUAL PROPERTY CREATE EACH TIME WHEN WE GET SOME DATA FROM THE DATABASE
+// 5) VIRTUAL FUNCTION ALWAYS USE REGULAR FUNCTION{NOT ARROW FUNCTION} CALL AS IT USE THE <this> KEYWORD OF JAVASCRIPT
 userSchema.virtual("fullName").get(function () {
-  if (!this.middleName) return this.firstName + " " + this.lastName;
+  if (!this.middleName) return `${this.firstName} ${this.lastName}`;
   else {
-    return this.firstName + " " + this.middleName + " " + this.lastName;
+    return `${this.firstName} ${this.middleName} ${this.lastName}`;
   }
 });
+
+// Note: If you specify schema.pre('remove'), Mongoose will register this middleware for doc.remove() by default. If you want to your middleware to run on Query.remove() use schema.pre('remove', { query: true, document: false }, fn).
 
 // Mongoose Document Middleware
 
@@ -192,6 +203,21 @@ userSchema.pre(/^find/, function (next) {
   next();
 });
 
+// ADD ALL THE ORGANIZATIONS TO CORRESPONDING USERS
+userSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "organizations",
+    select: "-__v  -district  -state -pinCode",
+  });
+  next();
+});
+
+// -------------------------AGGREGATION MIDDLEWARE------------------
+
+userSchema.pre("aggregate", function (next) {
+  this.pipeline().unshift({ $match: { active: { $ne: false } } });
+  next();
+});
 // INSTANCE METHODS
 
 // MATCH YOUR PASSWORD WITH THE PASSWORD SAVE IN DATABASE

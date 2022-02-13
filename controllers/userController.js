@@ -74,6 +74,18 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
+exports.getMyData = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+  if (!user) {
+    return next(new AppError("No user found", 404));
+  }
+  res.status(200).json({
+    status: "success",
+    data: {
+      user,
+    },
+  });
+});
 
 exports.updateMyData = catchAsync(async (req, res, next) => {
   // RESTRICT TO UPDATE PASSWORD HERE
@@ -93,10 +105,11 @@ exports.updateMyData = catchAsync(async (req, res, next) => {
     "lastName",
     "category",
     "address",
-    "gender",
-    "photo",
-    "phoneNumber",
-    "emailId"
+    // "gender",
+    // "photo",
+    // "phoneNumber",
+    "emailId",
+    "organizations"
   );
 
   // UPDATE USER DATA AFTER FILTERING
@@ -104,6 +117,8 @@ exports.updateMyData = catchAsync(async (req, res, next) => {
     new: true,
     runValidators: true,
   });
+
+  // await updatedUser.save({ validateBeforeSave: false });
 
   // SEND UPDATED DATA
   res.status(200).json({

@@ -1,8 +1,17 @@
 const express = require("express");
 const authController = require("./../controllers/authController.js");
 const userController = require("./../controllers/userController.js");
+const organizationRouter = require("./../routes/organizationRoutes.js");
 
 const router = express.Router();
+
+// ---------------------------NESTED ROUTES-----------------------------
+
+router.use("/:userId/organizations", organizationRouter);
+
+// ----------------------------------------------------------------------
+
+// ---------------------------- ALL USER AUTHORITY ----------------------
 router.post("/signup", authController.signup);
 router.post("/login", authController.login);
 router.post("/forgotPassword", authController.forgotPassword);
@@ -17,9 +26,11 @@ router.patch(
   authController.protect,
   userController.updateMyData
 );
+router.get("/getMyData", authController.protect, userController.getMyData);
 router.delete("/deleteMe", authController.protect, userController.deleteMe);
+// ----------------------------------------------------------------------
 
-// ONLY ACCESSIBLE TO ADMIN
+// ----------------------- ONLY ACCESSIBLE TO ADMIN -----------------------
 router
   .route("/")
   .get(
@@ -49,5 +60,6 @@ router
     authController.restrictTo("Admin"),
     userController.deleteUser
   );
+// --------------------------------------------------------------------
 
 module.exports = router;

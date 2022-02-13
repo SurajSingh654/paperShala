@@ -36,14 +36,6 @@ const assignAndSendToken = (user, statusCode, res) => {
 };
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create(req.body);
-  // const token = assignToken(newUser._id);
-  // res.status(201).json({
-  //   status: "success",
-  //   token,
-  //   data: {
-  //     user: newUser,
-  //   },
-  // });
   assignAndSendToken(newUser, 201, res);
   //   next();
 });
@@ -62,13 +54,6 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError("email or password is wrong", 401));
   }
   assignAndSendToken(user, 202, res);
-
-  // const token = assignToken(user._id);
-  // // IF EVERYTHING IS OK
-  // res.status(200).json({
-  //   status: "success",
-  //   token,
-  // });
 });
 
 exports.protect = catchAsync(async (req, res, next) => {

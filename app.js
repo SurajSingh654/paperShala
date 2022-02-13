@@ -11,6 +11,7 @@ const userRouter = require("./routes/userRoutes.js");
 const classRouter = require("./routes/classRoutes.js");
 const questionRouter = require("./routes/questionRoutes.js");
 const examPaperRouter = require("./routes/examPaperRoutes.js");
+const organizationRouter = require("./routes/organizationRoutes.js");
 
 const AppError = require("./utils/appError");
 const globalErrorHandlers = require("./controllers/errorController.js");
@@ -55,12 +56,7 @@ app.use(hpp());
 
 // JSON.parse ==> A function that transforms the results. This function is called for each member of the object. If a member contains nested objects, the nested objects are transformed before the parent object is.
 
-// Mount teacherRouter with "/api/v1/teachers"
-app.use("/api/v1/teachers", teacherRouter);
 app.use("/api/v1/users", userRouter);
-app.use("/api/v1/classes", classRouter);
-app.use("/api/v1/questions", questionRouter);
-app.use("/api/v1/examPapers", examPaperRouter);
 
 // Handle all invalid routes
 app.all("*", (req, res, next) => {
