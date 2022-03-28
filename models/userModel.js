@@ -204,13 +204,13 @@ userSchema.pre(/^find/, function (next) {
 });
 
 // ADD ALL THE ORGANIZATIONS TO CORRESPONDING USERS
-userSchema.pre(/^find/, function (next) {
-  this.populate({
-    path: "organizations",
-    select: "-__v  -district  -state -pinCode",
-  });
-  next();
-});
+// userSchema.pre(/^find/, function (next) {
+//   this.populate({
+//     path: "organizations",
+//     select: "-__v  -country -pinCode -organizationHead",
+//   });
+//   next();
+// });
 
 // -------------------------AGGREGATION MIDDLEWARE------------------
 

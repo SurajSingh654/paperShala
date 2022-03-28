@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
 const organizationSchema = new mongoose.Schema(
   {
+    organizationHead: {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+      unique: [true, "You are able to add only one organization"],
+    },
     organizationName: {
       type: String,
       trim: true,
@@ -57,9 +62,5 @@ organizationSchema.pre("save", function (next) {
 });
 
 // GET ALL THE DETAILS OF ORGANIZATIONS OF CURRENT USER
-// organizationSchema.pre(/^find/, function (req, res, next) {
-//   this.find({ allUsers: req.user.organization });
-//   next();
-// });
 const Organization = mongoose.model("Organization", organizationSchema);
 module.exports = Organization;

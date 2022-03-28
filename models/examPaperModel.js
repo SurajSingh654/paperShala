@@ -1,13 +1,22 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
+
 const examPaperSchema = new mongoose.Schema({
-  instituteAddress: {
-    type: String,
+  organization: {
+    type: mongoose.Schema.ObjectId,
     required: true,
-    trim: true,
+  },
+  teacher: {
+    type: mongoose.Schema.ObjectId,
+    required: true,
+  },
+  class: {
+    type: mongoose.Schema.ObjectId,
+    required: true,
   },
   examTime: {
     type: Date,
-    required: true,
+    // required: true,
   },
   maximumMarks: {
     type: Number,
@@ -17,16 +26,45 @@ const examPaperSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  className: {
-    type: String,
-  },
   generalInstructions: [
     {
-      type: Map,
-      of: String,
+      type: String,
     },
   ],
-  questions: [Array],
+  totalQuestions: {
+    type: Number,
+  },
+  totalMCQSingleCorrect: {
+    type: Number,
+  },
+  totalMCQMultiCorrect: {
+    type: Number,
+  },
+  totalMCQLongAnswers: {
+    type: Number,
+  },
+  totalShortAnswers: {
+    type: Number,
+  },
+  totalFillInTheBlanks: {
+    type: Number,
+  },
+  totalOneWord: {
+    type: Number,
+  },
+  totalTrueFalse: {
+    type: Number,
+  },
+  totalMatching: {
+    type: Number,
+  },
+  questions: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: "Question",
+    },
+  ],
 });
+
 const ExamPaper = mongoose.model("ExamPaper", examPaperSchema);
 module.exports = ExamPaper;

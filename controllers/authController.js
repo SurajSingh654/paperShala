@@ -88,6 +88,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
   // PASS USER DATA IN req.user
+  // console.log(freshUser);
   req.user = freshUser;
   // GRANT ACCESS
   next();
@@ -174,22 +175,20 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   // });
 });
 
-exports.updatePssswordForCurrentLoginUser = catchAsync(
-  async (req, res, next) => {
-    // 1) Get user from collection
-    const user = await User.findById(req.user.id).select("+password");
-    // 2) Check if posted current password is correct
+exports.updateMyPassword = catchAsync(async (req, res, next) => {
+  // 1) Get user from collection
+  const user = await User.findById(req.user.id).select("+password");
+  // 2) Check if posted current password is correct
 
-    if (
-      !(await user.checkPasswordMatch(req.body.currentPassword, user.password))
-    ) {
-      return next(new AppError("Incorrect password!"), 401);
-    }
-    // 3) If so, update password
-    user.password = req.body.password;
-    user.confirmPassword = req.body.confirmPassword;
-    await user.save();
-    // 4) Log user in, send JWT token
-    assignAndSendToken(user, 201, res);
+  if (
+    !(await user.checkPasswordMatch(req.body.currentPassword, user.password))
+  ) {
+    return next(new AppError("Incorrect password!"), 401);
   }
-);
+  // 3) If so, update password
+  user.password = req.body.password;
+  user.confirmPassword = req.body.confirmPassword;
+  await user.save();
+  // 4) Log user in, send JWT token
+  assignAndSendToken(user, 201, res);
+});

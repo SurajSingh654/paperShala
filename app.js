@@ -6,12 +6,11 @@ const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 const hpp = require("hpp");
-const teacherRouter = require("./routes/teacherRoutes.js");
 const userRouter = require("./routes/userRoutes.js");
-const classRouter = require("./routes/classRoutes.js");
-const questionRouter = require("./routes/questionRoutes.js");
-const examPaperRouter = require("./routes/examPaperRoutes.js");
-const organizationRouter = require("./routes/organizationRoutes.js");
+// const classRouter = require("./routes/classRoutes.js");
+// const questionRouter = require("./routes/questionRoutes.js");
+// const examPaperRouter = require("./routes/examPaperRoutes.js");
+// const organizationRouter = require("./routes/organizationRoutes.js");
 
 const AppError = require("./utils/appError");
 const globalErrorHandlers = require("./controllers/errorController.js");

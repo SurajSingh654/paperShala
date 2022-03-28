@@ -12,7 +12,7 @@ class APIFeatures {
     // 1B) AdvanceFiltering
     let queryStr = JSON.stringify(queryObject);
     queryStr = JSON.parse(
-      queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`)
+      queryStr.replace(/\b(gte|gt|lte|lt|eq|ne)\b/g, (match) => `$${match}`)
     );
 
     // Not able to use sort(),limit() etc...

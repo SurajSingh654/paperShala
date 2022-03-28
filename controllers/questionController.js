@@ -1,19 +1,49 @@
 const Question = require("./../models/questionModel.js");
-const APIFeatures = require("./../utils/APIFeatures.js");
-const catchAsync = require("./../utils/catchAsync");
+const factory = require("./../controllers/CRUDfactoryController.js");
 const AppError = require("./../utils/appError.js");
-exports.getAllQuestions = catchAsync(async (req, res, next) => {
-  // Build Query
-  const features = new APIFeatures(Question.find(), req.query)
-    .filter()
-    .sort()
-    .paginate()
-    .limitFields();
-  // Execute Query
-  const questions = await features.query;
-  res.status(200).json({
-    status: "success",
-    totalData: questions.length,
-    data: { questions },
-  });
-});
+const catchAsync = require("./../utils/catchAsync");
+const Class = require("./../models/classModel.js");
+exports.setTeacherId_OrganizationId_ClassId = catchAsync(
+  async (req, res, next) => {
+    if (req.params.organizationId) {
+      if (!req.user.organizations.includes(req.params.organizationId)) {
+        return next(
+          new AppError(
+            "You are not allowed to add question related to this organization!",
+            404
+          )
+        );
+      } else {
+        if (req.params.classId) {
+          const myClass = await Class.findById(req.params.classId);
+          if (!myClass) {
+            return next(
+              new AppError(
+                "You are not allowed to add question in this class!",
+                404
+              )
+            );
+          } else {
+            if (myClass.teacher != req.user.id) {
+              return next(
+                new AppError(
+                  "You are not allowed to add question for this class",
+                  404
+                )
+              );
+            }
+          }
+        }
+      }
+    }
+    req.body.organization = req.params.organizationId;
+    req.body.class = req.params.classId;
+    req.body.teacher = req.user.id;
+    next();
+  }
+);
+exports.deleteQuestion = factory.deleteOne(Question);
+exports.updateQuestion = factory.updateOne(Question);
+exports.createQuestion = factory.createOne(Question);
+exports.getQuestion = factory.getOne(Question);
+exports.getAllQuestions = factory.getAll(Question);

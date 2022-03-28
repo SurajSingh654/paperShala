@@ -1,24 +1,25 @@
 const Organization = require("./../models/organizationModel.js");
-const APIFeatures = require("./../utils/APIFeatures.js");
+const factory = require("./../controllers/CRUDfactoryController.js");
 const catchAsync = require("./../utils/catchAsync");
-const AppError = require("./../utils/appError.js");
-exports.getAllOrganizations = catchAsync(async (req, res, next) => {
-  // Build Query
-  const features = new APIFeatures(Organization.find(), req.query)
-    .filter()
-    .sort()
-    .paginate()
-    .limitFields();
-  // Execute Query
-  const organizations = await features.query;
-  res.status(200).json({
-    status: "success",
-    totalData: organizations.length,
-    data: { organizations },
+exports.setOrganizationHeadId = (req, res, next) => {
+  req.body.organizationHead = req.user.id;
+  next();
+};
+exports.createOrganization = factory.createOne(Organization);
+
+const filterObj = (obj, ...allowedFields) => {
+  const newObj = {};
+  Object.keys(obj).forEach((el) => {
+    if (allowedFields.includes(el)) {
+      newObj[el] = obj[el];
+    }
   });
-});
-exports.getOrganization = catchAsync(async (req, res, next) => {
-  const organization = await Organization.findById(req.params.id);
+  return newObj;
+};
+exports.getMyOrganization = catchAsync(async (req, res, next) => {
+  const organization = await Organization.find({
+    organizationHead: req.user.id,
+  });
   if (!organization) {
     return next(new AppError("No organization found", 404));
   }
@@ -29,40 +30,46 @@ exports.getOrganization = catchAsync(async (req, res, next) => {
     },
   });
 });
-exports.createOrganization = catchAsync(async (req, res, next) => {
-  const newOrganization = await Organization.create(req.body);
 
-  res.status(201).json({
-    status: "success",
-    data: {
-      organization: newOrganization,
-    },
-  });
-});
-exports.deleteOrganization = catchAsync(async (req, res, next) => {
-  const organization = await Organization.findByIdAndDelete(req.params.id);
-  if (!organization) {
-    return next(new AppError("No organization found with this id😑", 404));
-  }
-  res.status(204).json({
-    status: "success",
-    data: null,
-  });
-});
-exports.updateOrganization = catchAsync(async (req, res, next) => {
-  const organization = await Organization.findByIdAndUpdate(
-    req.params.id,
+exports.updateMyOrganization = catchAsync(async (req, res, next) => {
+  // FILTERED OUT UNWANTED FIELDS THAT ARE NOT ALLOWED HERE
+  const filteredBody = filterObj(
     req.body,
+    "organizationName",
+    "district",
+    "state",
+    "country",
+    "pinCode"
+  );
+
+  // UPDATE USER DATA AFTER FILTERING
+  const updatedOrganization = await Organization.findByIdAndUpdate(
+    { organizationHead: req.user.id },
+    filteredBody,
     {
       new: true,
       runValidators: true,
     }
   );
-  if (!organization) {
-    return next(new AppError("No organization found with this id😑", 404));
-  }
+
+  await updatedOrganization.save({ validateBeforeSave: false });
+
+  // SEND UPDATED DATA
   res.status(200).json({
     status: "success",
-    data: { organization },
+    data: {
+      organization: updatedOrganization,
+    },
+  });
+});
+
+exports.deleteMyOrganization = catchAsync(async (req, res, next) => {
+  await Organization.findByIdAndUpdate(
+    { organizationHead: req.user.id },
+    { active: false }
+  );
+  res.status(204).json({
+    status: "success",
+    organization: null,
   });
 });

@@ -28,6 +28,8 @@ const handleJWTError = () =>
 const handleJWTSessionExpiredError = () =>
   new AppError("Session expired! Please Login again...", 401);
 
+// const handleValidatorError = (err) => new AppError(err.message, 404);
+
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -81,6 +83,8 @@ module.exports = (err, req, res, next) => {
       if (error.name === "JsonWebTokenError") error = handleJWTError();
       if (error.name === "TokenExpiredError")
         error = handleJWTSessionExpiredError();
+      // if (error._message === "ExamPaper validation failed")
+      //   error = handleValidatorError(error);
       sendErrorProd(error, res);
     } else {
       sendErrorProd(err, res);
