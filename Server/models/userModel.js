@@ -68,7 +68,7 @@ const userSchema = new mongoose.Schema(
     address: {
       addressStreet: {
         type: String,
-        required: [true, "Address must be present"],
+        // required: [true, "Address must be present"],
         trim: true,
       },
       city: {

@@ -36,6 +36,7 @@ const assignAndSendToken = (user, statusCode, res) => {
 };
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create(req.body);
+  console.log(newUser);
   assignAndSendToken(newUser, 201, res);
   //   next();
 });
