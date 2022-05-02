@@ -3,21 +3,11 @@ const factory = require("./../controllers/CRUDfactoryController.js");
 const AppError = require("./../utils/appError.js");
 const catchAsync = require("./../utils/catchAsync");
 
-exports.setTeacherId_OrganizationId = catchAsync((req, res, next) => {
-  if (req.params.organizationId) {
-    if (!req.user.organizations.includes(req.params.organizationId)) {
-      return next(
-        new AppError(
-          "You are not allowed to add class related to this organization!",
-          404
-        )
-      );
-    }
-  }
-  req.body.organization = req.params.organizationId;
+exports.setTeacherIdAndOrganizationId = (req, res, next) => {
   req.body.teacher = req.user.id;
+  req.body.organization = req.user.organization;
   next();
-});
+};
 
 exports.deleteClass = factory.deleteOne(Class);
 exports.updateClass = factory.updateOne(Class);

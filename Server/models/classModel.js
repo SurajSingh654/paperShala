@@ -8,7 +8,7 @@ const classSchema = mongoose.Schema(
     },
     teacher: {
       type: mongoose.Schema.ObjectId,
-      ref: "User",
+      ref: "Teacher",
     },
     // B.tech , Bsc , Phd , BCA , MCA , HighSchool, Intermediate etc
     className: {
@@ -42,13 +42,13 @@ const classSchema = mongoose.Schema(
 
 // EMBED ALL USERS ASSOCIATED WITH THIS CLASS
 // ==> THERE IS A LIMITATION , THAT IT WORKS ONLY FOR .create() and .save() NEVER RUN DURING DOCUMENT UPDATE
-classSchema.pre(/^find/, function (next) {
-  this.populate({
-    path: "organization",
-    select: "-__v  -country -pinCode -state -district -organizationHead",
-  });
-  next();
-});
+// classSchema.pre(/^find/, function (next) {
+//   this.populate({
+//     path: "organization",
+//     select: "-__v  -country -pinCode -state -district -organizationHead",
+//   });
+//   next();
+// });
 
 const Class = mongoose.model("Class", classSchema);
 module.exports = Class;

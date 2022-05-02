@@ -1,11 +1,19 @@
 const Organization = require("./../models/organizationModel.js");
 const factory = require("./../controllers/CRUDfactoryController.js");
+const AppError = require("./../utils/appError.js");
 const catchAsync = require("./../utils/catchAsync");
-exports.setOrganizationHeadId = (req, res, next) => {
+
+exports.createMyOrganization = catchAsync(async (req, res, next) => {
   req.body.organizationHead = req.user.id;
-  next();
-};
-exports.createOrganization = factory.createOne(Organization);
+  const organization = await Organization.create(req.body);
+  res.status(201).json({
+    status: "success",
+    data: {
+      data: organization,
+    },
+  });
+});
+// exports.createOrganization = factory.createOne(Organization);
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -17,7 +25,8 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 exports.getMyOrganization = catchAsync(async (req, res, next) => {
-  const organization = await Organization.find({
+  console.log(req.user.id);
+  const organization = await Organization.findOne({
     organizationHead: req.user.id,
   });
   if (!organization) {
@@ -35,6 +44,7 @@ exports.updateMyOrganization = catchAsync(async (req, res, next) => {
   // FILTERED OUT UNWANTED FIELDS THAT ARE NOT ALLOWED HERE
   const filteredBody = filterObj(
     req.body,
+    "organizationHead",
     "organizationName",
     "district",
     "state",
@@ -43,7 +53,8 @@ exports.updateMyOrganization = catchAsync(async (req, res, next) => {
   );
 
   // UPDATE USER DATA AFTER FILTERING
-  const updatedOrganization = await Organization.findByIdAndUpdate(
+  console.log(req.user.id);
+  const organization = await Organization.findOneAndUpdate(
     { organizationHead: req.user.id },
     filteredBody,
     {
@@ -51,25 +62,33 @@ exports.updateMyOrganization = catchAsync(async (req, res, next) => {
       runValidators: true,
     }
   );
+  if (!organization) {
+    return next(new AppError("No organization found", 404));
+  }
 
-  await updatedOrganization.save({ validateBeforeSave: false });
+  await organization.save({ validateBeforeSave: false });
 
   // SEND UPDATED DATA
   res.status(200).json({
     status: "success",
     data: {
-      organization: updatedOrganization,
+      data: organization,
     },
   });
 });
 
 exports.deleteMyOrganization = catchAsync(async (req, res, next) => {
-  await Organization.findByIdAndUpdate(
+  const organization = await Organization.findOneAndUpdate(
     { organizationHead: req.user.id },
     { active: false }
   );
+  if (!organization) {
+    return next(new AppError("No organization found", 404));
+  }
   res.status(204).json({
     status: "success",
     organization: null,
   });
 });
+
+exports.getOrganization = factory.getOne(Organization);

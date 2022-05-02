@@ -6,14 +6,20 @@ const authController = require("./../controllers/authController.js");
 const router = express.Router({ mergeParams: true });
 
 // router.route("/").get(examPaperController.getAllExamPapers);
-router
-  .route("/")
-  .post(
-    authController.protect,
-    authController.restrictTo("Teacher"),
-    examPaperController.setTeacherId_OrganizationId_ClassId,
-    examPaperController.createExamPaper
-  );
+// router
+//   .route("/")
+//   .post(
+//     authController.protect,
+//     authController.restrictTo("Teacher"),
+//     examPaperController.setTeacherId_OrganizationId_ClassId,
+//     examPaperController.createExamPaper
+//   );
+router.route("/").post(
+  // authController.protect,
+  authController.restrictTo("Teacher"),
+  examPaperController.setTeacherId_OrganizationId_ClassId,
+  examPaperController.createExamPaper
+);
 
 // GET users/userId/organizations
 router

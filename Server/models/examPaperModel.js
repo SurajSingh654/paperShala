@@ -4,14 +4,17 @@ const validator = require("validator");
 const examPaperSchema = new mongoose.Schema({
   organization: {
     type: mongoose.Schema.ObjectId,
+    ref: "Organization",
     required: true,
   },
   teacher: {
     type: mongoose.Schema.ObjectId,
+    ref: "Teacher",
     required: true,
   },
   class: {
     type: mongoose.Schema.ObjectId,
+    ref: "Class",
     required: true,
   },
   examTime: {
@@ -40,13 +43,13 @@ const examPaperSchema = new mongoose.Schema({
   totalMCQMultiCorrect: {
     type: Number,
   },
-  totalMCQLongAnswers: {
+  totalMCQLongAnswer: {
     type: Number,
   },
-  totalShortAnswers: {
+  totalShortAnswer: {
     type: Number,
   },
-  totalFillInTheBlanks: {
+  totalFillInTheBlank: {
     type: Number,
   },
   totalOneWord: {

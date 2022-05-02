@@ -3,7 +3,7 @@ const organizationSchema = new mongoose.Schema(
   {
     organizationHead: {
       type: mongoose.Schema.ObjectId,
-      ref: "User",
+      ref: "OrganizationHead",
       unique: [true, "You are able to add only one organization"],
     },
     organizationName: {
@@ -37,6 +37,11 @@ const organizationSchema = new mongoose.Schema(
         message: "pinCode must be of 6 digits",
       },
     },
+    active: {
+      type: Boolean,
+      default: true,
+      select: false,
+    },
     photo: String,
   },
 
@@ -58,6 +63,10 @@ organizationSchema.pre("save", function (next) {
   this.district = capitalize(this.district);
   this.state = capitalize(this.state);
   this.country = capitalize(this.country);
+  next();
+});
+organizationSchema.pre(/^find/, function (next) {
+  this.find({ active: { $ne: false } });
   next();
 });
 

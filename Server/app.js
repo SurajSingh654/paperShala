@@ -6,7 +6,11 @@ const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 const hpp = require("hpp");
-const userRouter = require("./routes/userRoutes.js");
+const teacherRouter = require("./routes/teacherRoutes.js");
+const studentRouter = require("./routes/studentRoutes.js");
+const adminRouter = require("./routes/adminRoutes.js");
+const organizationHeadRouter = require("./routes/organizationHeadRoutes.js");
+
 // const classRouter = require("./routes/classRoutes.js");
 // const questionRouter = require("./routes/questionRoutes.js");
 // const examPaperRouter = require("./routes/examPaperRoutes.js");
@@ -55,7 +59,13 @@ app.use(hpp());
 
 // JSON.parse ==> A function that transforms the results. This function is called for each member of the object. If a member contains nested objects, the nested objects are transformed before the parent object is.
 
-app.use("/api/v1/users", userRouter);
+// app.use("/api/v1/users", userRouter);
+
+// All Routes
+app.use("/api/v1/teachers", teacherRouter);
+app.use("/api/v1/admins", adminRouter);
+app.use("/api/v1/organizationHeads", organizationHeadRouter);
+app.use("/api/v1/students", studentRouter);
 
 // Handle all invalid routes
 app.all("*", (req, res, next) => {

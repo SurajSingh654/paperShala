@@ -6,7 +6,7 @@ const examPaperRouter = require("./../routes/examPaperRoutes.js");
 
 // Router-level middleware
 const router = express.Router({ mergeParams: true });
-router.use("/:organizationId/classes", classRouter);
+router.use("/classes", classRouter);
 router.use("/:organizationId/examPapers", examPaperRouter);
 
 // --------------------------- NESTED ROUTES ------------------------
@@ -14,20 +14,24 @@ router.use("/:organizationId/examPapers", examPaperRouter);
 router
   .route("/")
   .post(
-    authController.protect,
     authController.restrictTo("OrganizationHead"),
-    organizationController.setOrganizationHeadId,
-    organizationController.createOrganization
+    organizationController.createMyOrganization
   );
 
-// GET users/userId/organizations
-// router
-//   .route("/")
-//   .get(
-//     authController.protect,
-//     authController.restrictTo("Teacher"),
-//     organizationController.getAllOrganizations
-//   );
+router
+  .route("/")
+  .get(
+    authController.restrictTo("OrganizationHead"),
+    organizationController.getMyOrganization
+  )
+  .patch(
+    authController.restrictTo("OrganizationHead"),
+    organizationController.updateMyOrganization
+  )
+  .delete(
+    authController.restrictTo("OrganizationHead"),
+    organizationController.deleteMyOrganization
+  );
 
 // // GET users/userId/organizations/organizationId
 // // DELETE users/userId/organizations/organizationId
@@ -36,37 +40,9 @@ router
 //   .route("/:id")
 //   .get(
 //     authController.protect,
-//     authController.restrictTo("Teacher", "OrganizationHead"),
+//     authController.restrictTo("Teacher", "Student"),
 //     organizationController.getOrganization
-//   )
-//   .delete(
-//     authController.protect,
-//     authController.restrictTo("OrganizationHead"),
-//     organizationController.deleteOrganization
-//   )
-//   .patch(
-//     authController.protect,
-//     authController.restrictTo("OrganizationHead"),
-//     organizationController.updateOrganization
 //   );
-
-router
-  .route("/")
-  .get(
-    authController.protect,
-    authController.restrictTo("OrganizationHead"),
-    organizationController.getMyOrganization
-  )
-  .patch(
-    authController.protect,
-    authController.restrictTo("OrganizationHead"),
-    organizationController.updateMyOrganization
-  )
-  .delete(
-    authController.protect,
-    authController.restrictTo("OrganizationHead"),
-    organizationController.deleteMyOrganization
-  );
 
 // ------------------------------------------------------------------------
 module.exports = router;

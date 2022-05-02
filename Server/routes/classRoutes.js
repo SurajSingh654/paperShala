@@ -11,31 +11,20 @@ router.use("/:classId/examPapers", examPaperRouter);
 router
   .route("/")
   .get(
-    authController.protect,
-    authController.restrictTo("Teacher"),
+    authController.restrictTo("Teacher", "OrganizationHead"),
     classController.getAllClasses
   )
   .post(
-    authController.protect,
     authController.restrictTo("Teacher"),
-    classController.setTeacherId_OrganizationId,
+    classController.setTeacherIdAndOrganizationId,
     classController.createClass
   );
 router
   .route("/:id")
   .get(
-    authController.protect,
-    authController.restrictTo("Teacher", "Student"),
+    authController.restrictTo("Teacher", "Student", "OrganizationHead"),
     classController.getClass
   )
-  .delete(
-    authController.protect,
-    authController.restrictTo("Teacher"),
-    classController.deleteClass
-  )
-  .patch(
-    authController.protect,
-    authController.restrictTo("Teacher"),
-    classController.updateClass
-  );
+  .delete(authController.restrictTo("Teacher"), classController.deleteClass)
+  .patch(authController.restrictTo("Teacher"), classController.updateClass);
 module.exports = router;

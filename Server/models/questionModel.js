@@ -29,7 +29,7 @@ const questionSchema = new mongoose.Schema(
     },
     teacher: {
       type: mongoose.Schema.ObjectId,
-      ref: "User",
+      ref: "Teacher",
     },
   },
   {
