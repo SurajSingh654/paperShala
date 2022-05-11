@@ -68,22 +68,22 @@ const teacherSchema = new mongoose.Schema(
     address: {
       addressStreet: {
         type: String,
-        required: [true, "Address must be present"],
+        // required: [true, "Address must be present"],
         trim: true,
       },
       city: {
         type: String,
-        required: [true, "City must be required"],
+        // required: [true, "City must be required"],
         trim: true,
       },
       state: {
         type: String,
-        required: [true, "State must be required"],
+        // required: [true, "State must be required"],
         trim: true,
       },
       pinCode: {
         type: Number,
-        required: [true, "Pincode must be required"],
+        // required: [true, "Pincode must be required"],
         validate: {
           validator: function (value) {
             return value.toString().length === 6;
@@ -93,7 +93,7 @@ const teacherSchema = new mongoose.Schema(
       },
       country: {
         type: String,
-        required: [true, "Country must be present"],
+        // required: [true, "Country must be present"],
         trim: true,
       },
     },
@@ -119,7 +119,7 @@ const teacherSchema = new mongoose.Schema(
     organization: {
       type: mongoose.Schema.ObjectId,
       ref: "Organization",
-      required: [true, "Organization must be present"],
+      // required: [true, "Organization must be present"],
     },
     active: {
       type: Boolean,

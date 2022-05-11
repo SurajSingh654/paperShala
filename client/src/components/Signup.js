@@ -1,48 +1,95 @@
-import React, { useState } from "react";
-import { NavLink, useHistory } from "react-router-dom";
-import signpic from "../images/signup.svg";
-
-const Signup = () => {
-  const history = useHistory();
-  const [user, setUser] = useState({
-    firstName: "",
-    middleName: "",
-    lastName: "",
-    emailId: "",
-    phoneNumber: "",
-    category: "",
-    gender: "",
-    address: {
-      addressstreet: "",
-      city: "",
-      state: "",
-      country: "",
-      pinCode: "",
-    },
-    // addressstreet: "",
-    // city: "",
-    // state: "",
-    // country: "",
-    // pinCode: "",
-    image: "",
-    password: "",
-    confirmPassword: "",
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+const Signup = (props) => {
+  const navigate = useNavigate();
+  const [firstName, setfirstName] = useState("");
+  const [middleName, setmiddleName] = useState("");
+  const [lastName, setlastName] = useState("");
+  const [emailId, setemailId] = useState("");
+  const [phoneNumber, setphoneNumber] = useState("");
+  const [category, setcategory] = useState("Student");
+  const [gender, setgender] = useState("Male");
+  const [password, setpassword] = useState("");
+  const [confirmPassword, setcpassword] = useState("");
+  const [image, setimage] = useState("");
+  const [address, setaddress] = useState({
+    // addressStreet: "",
+    city: "",
+    state: "",
+    country: "",
+    pinCode: 0,
   });
 
-  let name, value;
-
-  const handleInputs = (e) => {
-    console.log(e);
-    name = e.target.name;
-    value = e.target.value;
-
-    setUser({ ...user, [name]: value });
+  const firstNameChangeHandler = (event) => {
+    setfirstName(event.target.value);
   };
+  const middleNameChangeHandler = (event) => {
+    setmiddleName(event.target.value);
+  };
+  const lastNameChangeHandler = (event) => {
+    setlastName(event.target.value);
+  };
+  const emailIdChangeHandler = (event) => {
+    setemailId(event.target.value);
+  };
+  const phoneNumberChangeHandler = (event) => {
+    setphoneNumber(event.target.value);
+  };
+  const categoryChangeHandler = (event) => {
+    setcategory(event.target.value);
+  };
+  const genderChangeHandler = (event) => {
+    setgender(event.target.value);
+  };
+  const passwordChangeHandler = (event) => {
+    setpassword(event.target.value);
+  };
+  const cpasswordChangeHandler = (event) => {
+    setcpassword(event.target.value);
+  };
+  const imageChangeHandler = (event) => {
+    setimage(event.target.value);
+  };
+  const addressChangeHandler = (event) => {
+    setaddress((prev) => ({
+      ...prev,
+      [event.target.name]: event.target.value,
+    }));
+  };
+  const formSubmitHandler = async (event) => {
+    event.preventDefault();
+    const baseURL = `/api/v1/${
+      category[0].toLowerCase() + category.slice(1) + "s"
+    }`;
+    const res = await fetch(`${baseURL}/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        firstName,
+        lastName,
+        middleName,
+        emailId,
+        password,
+        confirmPassword,
+        phoneNumber,
+        category,
+        gender,
+        address,
+      }),
+    });
+    const data = await res.json();
+    if (data.status === "success") {
+      console.log("User Registered Successfully!");
+      navigate(`${baseURL}/homepage`);
+    } else {
+      console.log("User Registration UnSuccessfull!");
+      navigate(`/`);
+    }
+    console.log(data);
 
-  const PostData = async (e) => {
-    //e.preventDefault();
-
-    const {
+    const user = {
       firstName,
       middleName,
       lastName,
@@ -50,283 +97,220 @@ const Signup = () => {
       phoneNumber,
       category,
       gender,
-      address,
-      // addressstreet,
-      // city,
-      // state,
-      // country,
-      // pinCode,
-      image,
       password,
       confirmPassword,
-    } = user;
+      address,
+      image,
+    };
     console.log(user);
-    const res = await fetch("/api/v1/users/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        firstName,
-        middleName,
-        lastName,
-        emailId,
-        phoneNumber,
-        category,
-        gender,
-        address,
-        // addressstreet,
-        // city,
-        // state,
-        // country,
-        // pinCode,
-        image,
-        password,
-        confirmPassword,
-      }),
-    });
 
-    const data = await res.json();
-
-    // I need to change the data to res
-    if (data.status === 422 || !data) {
-      window.alert("Invalid Registration");
-      console.log("Invalid Registration");
-    } else {
-      window.alert(" Registration Successfull");
-      console.log("Successfull Registration");
-
-      history.push("/login");
-    }
+    // Lifting the state-up
+    props.onSaveUserData(user);
+    // setfirstName("");
+    // setmiddleName("");
+    // setlastName("");
+    // setemailId("");
+    // setphoneNumber("");
+    // setcategory("Student");
+    // setgender("Male");
+    // setpassword("");
+    // setcpassword("");
+    // setimage("");
+    // setaddress({addressStreet: "",
+    // city: "",
+    // state: "",
+    // country: "",
+    // pinCode: 0,})
   };
 
   return (
-    <>
-      <section className="signup">
-        <div className="container mt-5">
-          <div className="signup-content">
-            <div className="signup-form">
-              <h2 className="form-title">Sign up</h2>
-              <form method="POST" className="register-form" id="register-form">
-                <div className="form-group">
-                  <label htmlFor="firstName">
-                    <i className="zmdi zmdi-account material-icons-name"></i>
-                  </label>
-                  <input
-                    type="text"
-                    name="firstName"
-                    id="firstName"
-                    autocomplete="off"
-                    value={user.firstName}
-                    onChange={handleInputs}
-                    placeholder="Your FirstName"
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="middleName">
-                    <i className="zmdi zmdi-account material-icons-name"></i>
-                  </label>
-                  <input
-                    type="text"
-                    name="middleName"
-                    id="middleName"
-                    autocomplete="off"
-                    value={user.middleName}
-                    onChange={handleInputs}
-                    placeholder="Your MiddleName"
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="lastName">
-                    <i className="zmdi zmdi-account material-icons-name"></i>
-                  </label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    id="lastName"
-                    autocomplete="off"
-                    value={user.lastName}
-                    onChange={handleInputs}
-                    placeholder="Your LastName"
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="emailId">
-                    <i className="zmdi zmdi-email material-icons-name"></i>
-                  </label>
-                  <input
-                    type="emailId"
-                    name="emailId"
-                    id="emailId"
-                    autoComplete="off"
-                    value={user.emailId}
-                    onChange={handleInputs}
-                    placeholder="Your Email"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="phoneNumber">
-                    <i className="zmdi zmdi-phone-in-talk material-icons-name"></i>
-                  </label>
-                  <input
-                    type="number"
-                    name="phoneNumber"
-                    id="phoneNumber"
-                    autoComplete="off"
-                    value={user.phoneNumber}
-                    onChange={handleInputs}
-                    placeholder="Your Phone"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="category">
-                    <i className="zmdi zmdi-slideshow material-icons-name"></i>
-                  </label>
-                  <select name="category" id="category" onChange={handleInputs}>
-                    <option value={user.category}>Teacher</option>
-                    <option value={user.category}>Student</option>
-                    <option value={user.category}>Head</option>
-                    <option value={user.category}>Admin</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="gender">
-                    <i className="zmdi zmdi-slideshow material-icons-name"></i>
-                  </label>
-                  <select name="gender" id="gender" onChange={handleInputs}>
-                    <option value={user.gender}>Male</option>
-                    <option value={user.gender}>Female</option>
-                    <option value={user.gender}>Other</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="address">
-                    <i className="zmdi zmdi-lock material-icons-name"></i>
-                  </label>
-                  <input
-                    type="text"
-                    name="address"
-                    id="address"
-                    autoComplete="off"
-                    value={user.address.addressstreet}
-                    onChange={handleInputs}
-                    placeholder="Your Address"
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="city">
-                    <i className="zmdi zmdi-lock material-icons-name"></i>
-                  </label>
-                  <input
-                    type="text"
-                    name="city"
-                    id="city"
-                    autoComplete="off"
-                    value={user.address.city}
-                    onChange={handleInputs}
-                    placeholder="Your city"
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="state">
-                    <i className="zmdi zmdi-lock material-icons-name"></i>
-                  </label>
-                  <input
-                    type="text"
-                    name="state"
-                    id="state"
-                    autoComplete="off"
-                    value={user.address.state}
-                    onChange={handleInputs}
-                    placeholder="Your State"
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="country">
-                    <i className="zmdi zmdi-lock material-icons-name"></i>
-                  </label>
-                  <input
-                    type="text"
-                    name="country"
-                    id="country"
-                    autoComplete="off"
-                    value={user.address.country}
-                    onChange={handleInputs}
-                    placeholder="Your Country"
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="pinCode">
-                    <i className="zmdi zmdi-lock material-icons-name"></i>
-                  </label>
-                  <input
-                    type="number"
-                    name="pinCode"
-                    id="pinCode"
-                    autoComplete="off"
-                    value={user.address.pinCode}
-                    onChange={handleInputs}
-                    placeholder="Your Pincode"
-                  />
-                </div>
-                {/* ---------------------- */}
-                <div className="form-group">
-                  <label htmlFor="password">
-                    <i className="zmdi zmdi-lock material-icons-name"></i>
-                  </label>
-                  <input
-                    type="text"
-                    name="password"
-                    id="password"
-                    autoComplete="off"
-                    value={user.password}
-                    onChange={handleInputs}
-                    placeholder="Your Password"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="confirmPassword">
-                    <i className="zmdi zmdi-lock material-icons-name"></i>
-                  </label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    id="confirmPassword"
-                    autoComplete="off"
-                    value={user.confirmPassword}
-                    onChange={handleInputs}
-                    placeholder="Confirm Your Password"
-                  />
-                </div>
-
-                <div className="form-group form-button">
-                  <input
-                    type="submit"
-                    name="signup"
-                    id="signup"
-                    className="form-submit"
-                    value="signup"
-                    onClick={PostData}
-                  />
-                </div>
-              </form>
-            </div>
-
-            <div className="signup-image">
-              <figure>
-                <img src={signpic} alt="registration pic" />
-              </figure>
-              <NavLink to="/login" className="signup-image-link">
-                I am already register
-              </NavLink>
-            </div>
-          </div>
+    <div>
+      <form method="POST" onSubmit={formSubmitHandler}>
+        <h1>Signup Form</h1>
+        <div>
+          <label htmlFor="firstName">FirstName</label>
+          <input
+            type="text"
+            id="firstName"
+            name="firstName"
+            placeholder="your_firstname"
+            required
+            onChange={firstNameChangeHandler}
+            value={firstName}
+          ></input>
         </div>
-      </section>
-    </>
+        <div>
+          <label htmlFor="middleName">MiddleName</label>
+          <input
+            type="text"
+            id="middleName"
+            name="middleName"
+            placeholder="your_middlename"
+            onChange={middleNameChangeHandler}
+            value={middleName}
+          ></input>
+        </div>
+        <div>
+          <label htmlFor="lastName">LastName</label>
+          <input
+            type="text"
+            id="lastName"
+            name="lastName"
+            placeholder="your_lastname"
+            required
+            onChange={lastNameChangeHandler}
+            value={lastName}
+          ></input>
+        </div>
+        <div>
+          <label htmlFor="email">EmailId</label>
+          <input
+            type="text"
+            id="email"
+            name="email"
+            placeholder="your_emailID"
+            required
+            onChange={emailIdChangeHandler}
+            value={emailId}
+          ></input>
+        </div>
+        <div>
+          <label htmlFor="phoneNumber">PhoneNumber</label>
+          <input
+            type="number"
+            id="phoneNumber"
+            name="phoneNumber"
+            maxLength="10"
+            minLength="10"
+            min="1000000000"
+            max="9999999999"
+            placeholder="your_phonenumber"
+            required
+            onChange={phoneNumberChangeHandler}
+            value={phoneNumber}
+          ></input>
+        </div>
+        <div>
+          <label htmlFor="category">Category</label>
+          <select
+            name="category"
+            id="category"
+            onChange={categoryChangeHandler}
+            value={category}
+          >
+            <option value="OrganizationHead">OrganizationHead</option>
+            <option value="Teacher">Teacher</option>
+            <option value="Student">Student</option>
+          </select>
+        </div>
+        <div>
+          <label htmlFor="gender">Gender</label>
+          <select
+            name="gender"
+            id="gender"
+            onChange={genderChangeHandler}
+            value={gender}
+          >
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label htmlFor="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="your_password"
+            required
+            onChange={passwordChangeHandler}
+            value={password}
+          ></input>
+        </div>
+        <div>
+          <label htmlFor="confirmPassword">ConfirmPassword</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            placeholder="your_confirmpassword"
+            required
+            onChange={cpasswordChangeHandler}
+            value={confirmPassword}
+          ></input>
+        </div>
+        <div>
+          <label htmlFor="address">Address</label>
+          <label htmlFor="street">Street</label>
+          <input
+            type="text"
+            id="street"
+            name="street"
+            required
+            onChange={addressChangeHandler}
+            value={address.addressStreet}
+            placeholder="street"
+          ></input>
+          <label htmlFor="city">City</label>
+          <input
+            type="text"
+            id="city"
+            name="city"
+            required
+            onChange={addressChangeHandler}
+            value={address.city}
+            placeholder="city"
+          ></input>
+          <label htmlFor="state">State</label>
+          <input
+            type="text"
+            id="state"
+            name="state"
+            required
+            onChange={addressChangeHandler}
+            value={address.state}
+            placeholder="state"
+          ></input>
+          <label htmlFor="country">Country</label>
+          <input
+            type="text"
+            id="country"
+            name="country"
+            required
+            onChange={addressChangeHandler}
+            value={address.country}
+            placeholder="country"
+          ></input>
+          <label htmlFor="pinCode">PinCode</label>
+          <input
+            type="number"
+            id="pinCode"
+            name="pinCode"
+            required
+            onChange={addressChangeHandler}
+            value={address.pinCode}
+            placeholder="pinCode"
+          ></input>
+        </div>
+        <div>
+          <label htmlFor="photo">Image</label>
+
+          <input
+            type="file"
+            id="photo"
+            name="photo"
+            required
+            onChange={imageChangeHandler}
+            value={image}
+          ></input>
+        </div>
+
+        <div>
+          <button>Submit</button>
+        </div>
+      </form>
+    </div>
   );
 };
 

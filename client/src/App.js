@@ -1,76 +1,48 @@
-import React, {useReducer, createContext} from 'react'
-import { Route, Switch } from "react-router-dom";
-import 'bootstrap/dist/css/bootstrap.css';
-import "./App.css";
-import Navbar from "./components/Navbar";
-import Home from "./components/Home";
-import About from "./components/About";
-import Contact from "./components/Contact";
+import { useState } from "react";
+import { Route, Routes } from "react-router-dom";
+import BasicTable from "./components/TableComponents/BasicTable";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
-import ErrorPage from "./components/Errorpage";
-import Logout from "./components/Logout";
-
-import { initialState, reducer } from "./reducer/UseReducer";
-
-
-// we create a contextAPI 
-export const UserContext = createContext();
-
-  
-
-const Routing = () => {
-  
+import Student from "./components/StudentComponents/Student";
+import OrganizationHead from "./components/OrganizationHeadComponents/OrganizationHead";
+import Admin from "./components/AdminComponents/Admin";
+import Parent from "./components/ParentComponents/Parent";
+import Teacher from "./components/TeacherComponents/Teacher";
+import Users from "./components/Users";
+const App = () => {
+  const [users, setusers] = useState([]);
+  const onSaveUserDataHandler = (userData) => {
+    console.log(userData);
+    setusers((prev) => {
+      return [...prev, userData];
+    });
+    console.log(users);
+  };
   return (
     <>
-       <Switch>
-      <Route exact path="/">
-        <Home />
-      </Route>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <>
+              <Signup onSaveUserData={onSaveUserDataHandler} /> <Login />
+            </>
+          }
+        />
 
-      <Route path="/about">
-        <About />
-      </Route>
-
-      <Route path="/contact">
-        <Contact />
-      </Route>
-
-      <Route path="/login">
-        <Login />
-      </Route>
-
-      <Route path="/signup">
-        <Signup />
-      </Route>
-        
-      <Route path="/logout">
-        <Logout />
-      </Route>
-      
-      <Route>
-        <ErrorPage />
-      </Route>
-    </Switch>
+        <Route path="/api/v1/teachers/homepage/*" element={<Teacher />} />
+        <Route path="/api/v1/students/homepage/*" element={<Student />} />
+        <Route
+          path="/api/v1/organizationHeads/homepage/*"
+          element={<OrganizationHead />}
+        />
+        <Route path="/api/v1/admins/homepage/*" element={<Admin />} />
+        <Route path="/api/v1/parents/homepage/*" element={<Parent />} />
+      </Routes>
+      <Users users={users} />
+      <BasicTable users={users} />
     </>
-  )
-}
+  );
+};
 
-const App = () => {
-
-  //* we use useReducer
-  const [state, dispatch] = useReducer(reducer, initialState);
-
-  return (
-   
-      <UserContext.Provider value={{state, dispatch}}>
-        
-        <Navbar />
-        <Routing />
-
-      </UserContext.Provider>
-  )
-}
-
-export default App
-
+export default App;

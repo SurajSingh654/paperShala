@@ -1,98 +1,106 @@
-import React, {useState, useContext} from 'react';
-import loginpic from "../images/login.svg";
-import { NavLink, useHistory } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+const Login = (props) => {
+  const navigate = useNavigate();
+  const [emailId, setemailId] = useState("");
+  const [password, setpassword] = useState("");
+  const [category, setcategory] = useState("Student");
 
-import {UserContext} from "../App";
+  const emailIdChangeHandler = (event) => {
+    setemailId(event.target.value);
+  };
+  const passwordChangeHandler = (event) => {
+    setpassword(event.target.value);
+  };
+  const categoryChangeHandler = (event) => {
+    setcategory(event.target.value);
+  };
 
-const Login = () => {
-    const { state, dispatch } = useContext(UserContext);
-    
-    const history = useHistory();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-
-    const loginUser = async (e) => {
-        e.preventDefault();
-
-        const res = await fetch('/signin', {
-            method:"POST",
-            headers:{
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                email,
-                password
-            })
-        });
-
-        const data = res.json();
-
-        if (res.status === 400 || !data) {
-            window.alert("Invalid Credentials");
-        } else {
-            dispatch({ type: 'USER', payload: true });
-            window.alert("Login Successfull");
-            history.push("/");
-        }
+  const formSubmitHandler = async (event) => {
+    event.preventDefault();
+    const baseURL = `/api/v1/${
+      category[0].toLowerCase() + category.slice(1) + "s"
+    }`;
+    const res = await fetch(`${baseURL}/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        emailId,
+        password,
+      }),
+    });
+    const data = await res.json();
+    if (data.status === "success") {
+      console.log("User LoggedIn Successfully!");
+      navigate(`${baseURL}/homepage`);
+    } else {
+      console.log("User Registration UnSuccessfull!");
+      navigate(`/`);
     }
+    console.log(data);
 
-    return (
-        <>
-             <section className="sign-in">
-                <div className="container mt-5">
-                    <div className="signin-content">
-                          
-                            <div className="signin-image">
-                                <figure>
-                                    <img src={loginpic} alt="Login pic" />
-                                </figure>
-                                <NavLink to="/signup" className="signup-image-link">Create an Account</NavLink>
-                            </div>
-                       
-                        <div className="signin-form">
-                            <h2 className="form-title">Sign up</h2>
-                            <form method="POST" className="register-form" id="register-form">
-                             
+    const user = {
+      emailId,
 
-                                 <div className="form-group">
-                                    <label htmlFor="email">
-                                        <i className="zmdi zmdi-email material-icons-name"></i>
-                                    </label>
-                                    <input type="email" name="email" id="email" autoComplete="off"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="Your Email"
-                                    />
-                                </div>
+      password,
+    };
+    console.log(user);
 
+    // Lifting the state-up
+    // setemailId("");
+    // setpassword("");
+  };
 
-                                 <div className="form-group">
-                                    <label htmlFor="password">
-                                        <i className="zmdi zmdi-lock material-icons-name"></i>
-                                    </label>
-                                    <input type="password" name="password" id="password" autoComplete="off"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        placeholder="Your Password"
-                                    />
-                                </div>
+  return (
+    <div>
+      <form method="POST" onSubmit={formSubmitHandler}>
+        <h1>Login Form</h1>
+        <div>
+          <label htmlFor="loginemail">EmailId</label>
+          <input
+            type="text"
+            id="loginemail"
+            name="loginemail"
+            placeholder="your_emailID"
+            required
+            onChange={emailIdChangeHandler}
+            value={emailId}
+          ></input>
+        </div>
+        <div>
+          <label htmlFor="loginpassword">Password</label>
+          <input
+            type="password"
+            id="loginpassword"
+            name="loginpassword"
+            placeholder="your_password"
+            required
+            onChange={passwordChangeHandler}
+            value={password}
+          ></input>
+        </div>
+        <div>
+          <label htmlFor="logincategory">Category</label>
+          <select
+            name="logincategory"
+            id="logincategory"
+            onChange={categoryChangeHandler}
+            value={category}
+          >
+            <option value="OrganizationHead">OrganizationHead</option>
+            <option value="Teacher">Teacher</option>
+            <option value="Student">Student</option>
+          </select>
+        </div>
 
-                              
-                                <div className="form-group form-button">
-                                    <input type="submit" name="signin" id="signin" className="form-submit"
-                                        value="Log In"
-                                        onClick={loginUser}
-                                    />
-                                </div>
+        <div>
+          <button>Submit</button>
+        </div>
+      </form>
+    </div>
+  );
+};
 
-                            </form>
-                        </div>
-                      
-                    </div>
-                </div>
-           </section>
-       </>
-    )
-}
-
-export default Login
+export default Login;
